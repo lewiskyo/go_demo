@@ -1,8 +1,11 @@
-module go_demo/concurrent_http
+module go_demo
 
 go 1.18
 
-require github.com/gin-gonic/gin v1.8.1
+require (
+	github.com/gin-gonic/gin v1.8.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+)
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
