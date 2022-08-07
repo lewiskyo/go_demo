@@ -2,6 +2,10 @@ package main
 
 import "fmt"
 
+// 官网effective go
+// https://go.dev/doc/effective_go#pointers_vs_values
+// https://zhuanlan.zhihu.com/p/101363361
+
 /* 官方FAQ三条建议规则
    1. 第一条也是最重要的一条，方法是否要修改 receiver？
    2. 其次是效率的考虑，如果 receiver 非常大，比如说一个大 struct，使用指针将非常合适。
@@ -33,16 +37,25 @@ func (b Ball) Pong() {
 	fmt.Println("pong")
 }
 
+func NewBall() Ball { // 返回一个右值
+	return Ball{Name: "right value struct"}
+}
+
+// 值方法（value methods）可以通过指针和值调用，但是指针方法（pointer methods）只能通过指针来调用。
+// 但有一个例外，如果某个值是可寻址的（addressable，或者说左值），那么编译器会在值调用指针方法时自动插入取地址符，使得在此情形下看起来像指针方法也可以通过值来调用。
 func v1() {
 	// struct 的实例和实例指针都可以调用值类型和指针类型的receiver的方法
 	v := Ball{}
 	p := &Ball{}
 
-	v.Ping()
+	v.Ping() // 可寻址, 所以值类型可以调用指针方法
 	v.Pong()
 
 	p.Ping()
 	p.Pong()
+
+	// NewBall().Ping() // 编译不通过, 不可寻址
+	NewBall().Pong()
 }
 
 type BallV2 struct {
