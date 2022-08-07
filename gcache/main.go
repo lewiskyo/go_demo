@@ -9,6 +9,12 @@ import (
 	gcache "github.com/patrickmn/go-cache"
 )
 
+type Data struct {
+	A int
+	B string
+	C float32
+}
+
 func main() {
 	cache.Init()
 
@@ -38,4 +44,9 @@ func main() {
 	}
 
 	cache.Instance.Set("k2", "v2", gcache.NoExpiration) // 不过期
+
+	d := Data{A: 11, B: "123", C: 3.12}
+	cache.Instance.Set("k3", d, gcache.NoExpiration)
+	d2, _ := cache.Instance.Get("k3")
+	fmt.Printf("data: %+v\n", d2.(Data))
 }
