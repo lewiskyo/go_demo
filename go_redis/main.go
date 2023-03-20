@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/google/uuid"
 )
 
 func connectRedis() *redis.Client {
@@ -87,6 +88,28 @@ func testSegmentSet(client *redis.Client) {
 	wg.Wait()
 }
 
+// 测试uuid分段set占用内存
+func testUuidSegmentSet(client *redis.Client) {
+	wg := sync.WaitGroup{}
+	seg := 10000
+	per := 17000
+
+	for i := 0; i < seg; i++ {
+		wg.Add(1)
+		temp := i
+		go func(idx int) {
+			defer wg.Done()
+			key := strconv.Itoa(idx)
+			for j := 0; j < per; j++ {
+				uuid := uuid.New()
+				client.SAdd(key, uuid.String())
+			}
+		}(temp)
+	}
+
+	wg.Wait()
+}
+
 // 测试分段bitmap占用内存
 func testSegmentBitmap(client *redis.Client) {
 	length := 10000000
@@ -98,7 +121,8 @@ func testSegmentBitmap(client *redis.Client) {
 }
 
 func main() {
-	// rd := connectRedis()
+	rd := connectRedis()
+	testUuidSegmentSet(rd)
 	// testString(rd)
 	// testSegmentSet(rd)
 	// testSegmentBitmap(rd)
